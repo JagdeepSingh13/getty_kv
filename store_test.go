@@ -35,11 +35,13 @@ func TestSetGet_RoundTrip(t *testing.T) {
 	store := NewStore()
 	store.Set("hello", "world")
 
-	if val, ok := store.Get("hello"); !ok || val != "world" {
+	// should give "world", nil
+	if val, err := store.Get("hello"); err != nil || val != "world" {
 		t.Errorf("Get() failed")
 	}
 
-	if val, ok := store.Get("missing"); ok || val != "" {
+	// should give "", err
+	if val, err := store.Get("missing"); err == nil || val != "" {
 		t.Errorf("Get() failed")
 	}
 }

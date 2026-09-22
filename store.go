@@ -1,6 +1,11 @@
 package main
 
-import "sort"
+import (
+	"errors"
+	"sort"
+)
+
+var ErrKeyDoesNotExists = errors.New("key does not exists")
 
 type Store struct {
 	data map[string]string
@@ -16,17 +21,14 @@ func NewStore() *Store {
 
 func (s *Store) Rename(oldKey, newKey string) {
 	// remove the val and oldKey, insert val with newKey
-	if val, ok := s.Get(oldKey); ok {
+	if val, err := s.Get(oldKey); err != nil {
 		s.Delete(oldKey)
 		s.Set(newKey, val)
 	}
 }
 
 func (s *Store) Pop(key string) (string, bool) {
-	val, ok := s.Get(key)
-	if !ok {
-		return "", false
-	}
+	val, _ := s.Get(key)
 
 	s.Delete(key)
 	return val, true
@@ -44,9 +46,13 @@ func (s *Store) Keys() []string {
 	return keys
 }
 
-func (s *Store) Get(key string) (string, bool) {
+func (s *Store) Get(key string) (string, error) {
 	val, ok := s.data[key]
-	return val, ok
+	if !ok {
+		return "", ErrKeyDoesNotExists
+	}
+
+	return val, nil
 }
 
 func (s *Store) Set(key, val string) {
