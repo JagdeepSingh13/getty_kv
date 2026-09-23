@@ -1,14 +1,11 @@
-package main
+package kv
 
 import (
-	"errors"
 	"fmt"
 	"sort"
-)
 
-var ErrKeyDoesNotExists = errors.New("key does not exists")
-var ErrEmptyKey = errors.New("key is mandatory")
-var ErrorStoreFull = errors.New("store is full")
+	"github.com/JagdeepSingh13/store"
+)
 
 type Store struct {
 	data    map[string]string
@@ -54,12 +51,12 @@ func (s *Store) Keys() []string {
 
 func (s *Store) Get(key string) (string, error) {
 	if key == "" {
-		return "", ErrEmptyKey
+		return "", store.ErrEmptyKey
 	}
 
 	val, ok := s.data[key]
 	if !ok {
-		return "", ErrKeyDoesNotExists
+		return "", store.ErrKeyDoesNotExists
 	}
 
 	return val, nil
@@ -67,13 +64,13 @@ func (s *Store) Get(key string) (string, error) {
 
 func (s *Store) Set(key, val string) error {
 	if key == "" {
-		return ErrEmptyKey
+		return store.ErrEmptyKey
 	}
 
 	_, ex := s.data[key]
-	// check for update else throw error
+	// check for update key else throw error since full cap.
 	if s.maxSize > 0 && s.Len() >= s.maxSize && !ex {
-		return fmt.Errorf("Set(%q): %w", key, ErrorStoreFull)
+		return fmt.Errorf("Set(%q): %w", key, store.ErrorStoreFull)
 	}
 
 	s.data[key] = val

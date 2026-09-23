@@ -1,29 +1,42 @@
 package main
 
 import (
-	"errors"
+	"encoding/base64"
 	"fmt"
+	"time"
+
+	"github.com/JagdeepSingh13/store/kv"
+	"github.com/JagdeepSingh13/store/ttl"
 )
 
 func main() {
-	// need to pass the max. keys we can store
-	// also can do Set() again on same key even if full cap., like a update
-	s := NewStore(2)
-
-	s.Set("a", "45")
-	s.Delete("a")
-
-	val, err := s.Get("b")
+	s := kv.NewStore(3)
+	enc, err := SetKeyWithEncryption(*s, "d", "60")
 	if err != nil {
-		if errors.Is(err, ErrKeyDoesNotExists) {
-			// do smtg like -> 400 http
-			fmt.Println("key not exists error")
-			return
-		}
-		// 500
 		fmt.Println(err)
+		return
 	}
-	fmt.Println(val)
+	fmt.Println(enc)
+
+	ttlStore := ttl.NewTtlStore(time.Second * 2)
+	encc, err := SetKeyWithEncryption(ttlStore, "e", "ttl entry")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(encc)
 
 	fmt.Println("hello getty")
+}
+
+// need to make Store Interface so that both Store & TtlStore can use
+// enc. fn. at same time, Polymorphism
+
+func SetKeyWithEncryption(store Storer, key, val string) (string, error) {
+	encoded := base64.StdEncoding.EncodeToString([]byte(val))
+	if err := store.Set(key, encoded); err != nil {
+		return "", nil
+	}
+
+	return store.Get(key)
 }

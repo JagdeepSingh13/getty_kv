@@ -1,4 +1,4 @@
-package main
+package kv
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 // using the testing package and TestXxx method
 
 func TestKeys_ReturnsAllKeysSorted(t *testing.T) {
-	store := NewStore()
+	store := NewStore(3)
 	store.Set("charlie", "3")
 	store.Set("bravo", "2")
 	store.Set("alpha", "1")
@@ -23,7 +23,7 @@ func TestKeys_ReturnsAllKeysSorted(t *testing.T) {
 }
 
 func TestKeys_EmptyStore(t *testing.T) {
-	store := NewStore()
+	store := NewStore(3)
 	// store.Set("a", "45")
 
 	got := store.Keys()
@@ -33,7 +33,7 @@ func TestKeys_EmptyStore(t *testing.T) {
 }
 
 func TestSetGet_RoundTrip(t *testing.T) {
-	store := NewStore()
+	store := NewStore(3)
 	store.Set("hello", "world")
 
 	// should give "world", nil
@@ -48,7 +48,7 @@ func TestSetGet_RoundTrip(t *testing.T) {
 }
 
 func TestSetGet_EmptyKeys(t *testing.T) {
-	store := NewStore()
+	store := NewStore(3)
 
 	if _, err := store.Get(""); err == nil || !errors.Is(err, ErrEmptyKey) {
 		t.Error("Get() failed")
