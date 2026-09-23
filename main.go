@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/JagdeepSingh13/store"
 	"github.com/JagdeepSingh13/store/kv"
 	"github.com/JagdeepSingh13/store/ttl"
 )
 
 func main() {
-	s := kv.NewStore(3)
-	enc, err := SetKeyWithEncryption(*s, "d", "60")
+	kv := kv.NewStore(3)
+	enc, err := SetKeyWithEncryption(kv, "d", "60")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -32,7 +33,7 @@ func main() {
 // need to make Store Interface so that both Store & TtlStore can use
 // enc. fn. at same time, Polymorphism
 
-func SetKeyWithEncryption(store Storer, key, val string) (string, error) {
+func SetKeyWithEncryption(store store.Storer, key, val string) (string, error) {
 	encoded := base64.StdEncoding.EncodeToString([]byte(val))
 	if err := store.Set(key, encoded); err != nil {
 		return "", nil
