@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 )
@@ -43,5 +44,13 @@ func TestSetGet_RoundTrip(t *testing.T) {
 	// should give "", err
 	if val, err := store.Get("missing"); err == nil || val != "" {
 		t.Errorf("Get() failed")
+	}
+}
+
+func TestSetGet_EmptyKeys(t *testing.T) {
+	store := NewStore()
+
+	if _, err := store.Get(""); err == nil || !errors.Is(err, ErrEmptyKey) {
+		t.Error("Get() failed")
 	}
 }

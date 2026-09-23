@@ -6,7 +6,9 @@ import (
 )
 
 func main() {
-	s := NewStore()
+	// need to pass the max. keys we can store
+	// also can do Set() again on same key even if full cap., like a update
+	s := NewStore(2)
 
 	s.Set("a", "45")
 	s.Delete("a")
