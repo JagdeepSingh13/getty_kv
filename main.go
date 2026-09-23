@@ -11,8 +11,10 @@ import (
 )
 
 func main() {
-	kv := kv.NewStore(3)
-	enc, err := SetKeyWithEncryption(kv, "d", "60")
+	plain := kv.NewStore(3)
+	logger := NewLoggingMiddleware(plain)
+
+	enc, err := SetKeyWithEncryption(logger, "d", "60")
 	if err != nil {
 		fmt.Println(err)
 		return

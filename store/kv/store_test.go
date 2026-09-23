@@ -4,6 +4,8 @@ import (
 	"errors"
 	"reflect"
 	"testing"
+
+	"github.com/JagdeepSingh13/store"
 )
 
 // using the testing package and TestXxx method
@@ -48,9 +50,9 @@ func TestSetGet_RoundTrip(t *testing.T) {
 }
 
 func TestSetGet_EmptyKeys(t *testing.T) {
-	store := NewStore(3)
+	s := NewStore(3)
 
-	if _, err := store.Get(""); err == nil || !errors.Is(err, ErrEmptyKey) {
+	if _, err := s.Get(""); err == nil || !errors.Is(err, store.ErrEmptyKey) {
 		t.Error("Get() failed")
 	}
 }
