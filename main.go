@@ -3,26 +3,41 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"sync"
+	"time"
 
 	"github.com/JagdeepSingh13/store"
 	"github.com/JagdeepSingh13/store/kv"
 )
 
+// so we use pessimistic locking
+var counter int // shared mem.
+var mu sync.Mutex
+
+func inc() {
+	mu.Lock()
+	defer mu.Unlock()
+
+	v := counter
+	time.Sleep(time.Millisecond)
+	counter = v + 1
+}
+
 func main() {
-	cmds := []Command{
-		{Op: "SET", Key: "env", Value: "prod"},
-		{Op: "SET", Key: "version", Value: "0.0.1"},
-		{Op: "SET", Key: "debug", Value: "true"},
-		{Op: "GET", Key: "env"},
-		{Op: "SET", Key: "region", Value: "us-east-1"},
-		{Op: "GET", Key: "version"},
+	exp := 1000
+	var wg sync.WaitGroup
+
+	for i := 0; i < exp; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			inc()
+		}()
 	}
+	wg.Wait()
 
-	s := kv.NewStore(0)
-	RestoreOnBoot(s, cmds)
-
-	fmt.Println("restore, store size: ", s.Len())
-	fmt.Println("keys: ", s.Keys())
+	fmt.Println("counter: ", counter)
+	fmt.Println("exp: ", exp)
 
 	fmt.Println("hello getty")
 }
