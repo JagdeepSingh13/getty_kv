@@ -13,13 +13,16 @@ import (
 func main() {
 	plain := kv.NewStore(3)
 	logger := NewLoggingMiddleware(plain)
+	metrics := NewMetricsMiddleware(logger)
+	// s := CreateStore()
 
-	enc, err := SetKeyWithEncryption(logger, "d", "60")
+	_, err := SetKeyWithEncryption(metrics, "d", "60")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(enc)
+
+	metrics.Report()
 
 	ttlStore := ttl.NewTtlStore(time.Second * 2)
 	encc, err := SetKeyWithEncryption(ttlStore, "e", "ttl entry")
@@ -30,6 +33,13 @@ func main() {
 	fmt.Println(encc)
 
 	fmt.Println("hello getty")
+}
+
+func CreateStore() store.Storer {
+	plain := kv.NewStore(3)
+	logger := NewLoggingMiddleware(plain)
+
+	return logger
 }
 
 // need to make Store Interface so that both Store & TtlStore can use
