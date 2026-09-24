@@ -9,6 +9,20 @@ import (
 )
 
 func main() {
+	cmds := []Command{
+		{Op: "SET", Key: "env", Value: "prod"},
+		{Op: "SET", Key: "version", Value: "0.0.1"},
+		{Op: "SET", Key: "debug", Value: "true"},
+		{Op: "GET", Key: "env"},
+		{Op: "SET", Key: "region", Value: "us-east-1"},
+		{Op: "GET", Key: "version"},
+	}
+
+	s := kv.NewStore(0)
+	RestoreOnBoot(s, cmds)
+
+	fmt.Println("restore, store size: ", s.Len())
+	fmt.Println("keys: ", s.Keys())
 
 	fmt.Println("hello getty")
 }
