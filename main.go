@@ -3,36 +3,29 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"time"
 
 	"github.com/JagdeepSingh13/store"
 	"github.com/JagdeepSingh13/store/kv"
-	"github.com/JagdeepSingh13/store/ttl"
 )
 
 func main() {
-	plain := kv.NewStore(3)
-	logger := NewLoggingMiddleware(plain)
-	metrics := NewMetricsMiddleware(logger)
-	// s := CreateStore()
-
-	_, err := SetKeyWithEncryption(metrics, "d", "60")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	metrics.Report()
-
-	ttlStore := ttl.NewTtlStore(time.Second * 2)
-	encc, err := SetKeyWithEncryption(ttlStore, "e", "ttl entry")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(encc)
 
 	fmt.Println("hello getty")
+}
+
+func PopulateDefaults(s store.Storer) error {
+	def := map[string]string{
+		"env":     "dev",
+		"version": "0.0.1",
+	}
+
+	for k, v := range def {
+		if err := s.Set(k, v); err != nil {
+			return fmt.Errorf("Populate Defauls: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func CreateStore() store.Storer {

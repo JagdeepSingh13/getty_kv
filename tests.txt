@@ -1,0 +1,33 @@
+-- middleware passing, forwarding
+
+plain := kv.NewStore(3)
+logger := NewLoggingMiddleware(plain)
+metrics := NewMetricsMiddleware(logger)
+s := CreateStore()
+
+_, err := SetKeyWithEncryption(metrics, "d", "60")
+if err != nil {
+    fmt.Println(err)
+    return
+}
+
+metrics.Report()
+
+ttlStore := ttl.NewTtlStore(time.Second * 2)
+encc, err := SetKeyWithEncryption(ttlStore, "e", "ttl entry")
+if err != nil {
+    fmt.Println(err)
+    return
+}
+fmt.Println(encc)
+
+-- Cloning store 
+
+kv := kv.NewStore(3)
+PopulateDefaults(kv)
+
+cpStore := kv.Clone()
+cpStore.Set("env", "prod")
+
+fmt.Println(kv)
+fmt.Println(cpStore)

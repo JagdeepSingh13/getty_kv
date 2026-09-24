@@ -19,6 +19,21 @@ func NewStore(maxSize int) *Store {
 	}
 }
 
+// need to make a copy of the store, but since data(hmap) is a ptr
+// copy store modifies the org. store, so used loop
+func (s *Store) Clone() *Store {
+	cp := &Store{
+		data:    make(map[string]string, len(s.data)),
+		maxSize: s.maxSize,
+	}
+
+	for k, v := range s.data {
+		cp.data[k] = v
+	}
+
+	return cp
+}
+
 // make the test, run it first
 
 func (s *Store) Rename(oldKey, newKey string) {
