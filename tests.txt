@@ -48,3 +48,32 @@ RestoreOnBoot(s, cmds)
 
 fmt.Println("restore, store size: ", s.Len())
 fmt.Println("keys: ", s.Keys())
+
+-- mutexes
+// so we use pessimistic locking
+var counter int // shared mem.
+var mu sync.Mutex
+
+func inc() {
+	mu.Lock()
+	defer mu.Unlock()
+
+	v := counter
+	time.Sleep(time.Millisecond)
+	counter = v + 1
+}
+
+exp := 1000
+var wg sync.WaitGroup
+
+for i := 0; i < exp; i++ {
+    wg.Add(1)
+    go func() {
+        defer wg.Done()
+        inc()
+    }()
+}
+wg.Wait()
+
+fmt.Println("counter: ", counter)
+fmt.Println("exp: ", exp)

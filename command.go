@@ -20,8 +20,10 @@ func dispatch(s store.Storer, c Command) {
 		log.Printf("SET key: %s", c.Key)
 		time.Sleep(time.Second * 1)
 		s.Set(c.Key, c.Value)
-	case "GET":
-		s.Get(c.Key)
+	// case "GET":
+	// 	s.Get(c.Key)
+	case "INCR":
+		s.Incr(c.Key)
 	}
 }
 

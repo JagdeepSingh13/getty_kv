@@ -85,3 +85,11 @@ func (m *MetricsMiddleware) Report() {
 		fmt.Printf("Avg SET latency: %v\n", avg)
 	}
 }
+
+func (m *MetricsMiddleware) Incr(key string) (int, error) {
+	if key == "" {
+		return 0, store.ErrEmptyKey
+	}
+
+	return 0, nil
+}

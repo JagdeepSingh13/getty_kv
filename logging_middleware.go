@@ -59,3 +59,11 @@ func (l *LoggingMiddleware) Len() int {
 
 	return got
 }
+
+func (l *LoggingMiddleware) Incr(key string) (int, error) {
+	if key == "" {
+		return 0, store.ErrEmptyKey
+	}
+
+	return 0, nil
+}
