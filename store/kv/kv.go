@@ -12,7 +12,7 @@ import (
 
 // maps in go are not concurrent
 type Store struct {
-	mu      sync.Mutex
+	mu      sync.RWMutex
 	data    map[string]string
 	maxSize int
 }
@@ -32,8 +32,8 @@ func (s *Store) Clone() *Store {
 		maxSize: s.maxSize,
 	}
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	for k, v := range s.data {
 		cp.data[k] = v
@@ -61,8 +61,8 @@ func (s *Store) Pop(key string) (string, bool) {
 }
 
 func (s *Store) Keys() []string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	keys := make([]string, 0, len(s.data))
 
@@ -80,8 +80,8 @@ func (s *Store) Get(key string) (string, error) {
 		return "", store.ErrEmptyKey
 	}
 
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	val, ok := s.data[key]
 	if !ok {
@@ -119,8 +119,8 @@ func (s *Store) Delete(key string) {
 }
 
 func (s *Store) Len() int {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	return len(s.data)
 }
@@ -133,6 +133,7 @@ func (s *Store) Incr(key string) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	// read
 	cur := 0
 	if raw, ok := s.data[key]; ok {
 		v, err := strconv.Atoi(raw)
@@ -142,9 +143,11 @@ func (s *Store) Incr(key string) (int, error) {
 		cur = v
 	}
 
+	// modify
 	cur++
 	time.Sleep(time.Microsecond)
 
+	// write
 	s.data[key] = strconv.Itoa(cur)
 
 	return cur, nil
