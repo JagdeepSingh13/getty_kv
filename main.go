@@ -3,39 +3,13 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	"sync"
-	"time"
 
 	"github.com/JagdeepSingh13/store"
 	"github.com/JagdeepSingh13/store/kv"
 )
 
 func main() {
-	store := kv.NewStore(0)
-	store.Set("name", "jsingh")
-
-	// using RWMutex
-	// so that many go routines can read simultaneously but
-	// Lock when write oprn
-	const readers = 100
-	const readEach = 10
-
-	start := time.Now()
-	var wg sync.WaitGroup
-	for range readers {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-			for range readEach {
-				store.Get("name")
-			}
-		}()
-	}
-	wg.Wait()
-
-	fmt.Printf("%d readers did %d cons. cuncurr. reads in %s\n", readers, readEach,
-		time.Since(start).Round(time.Millisecond))
-
+	cmain()
 	fmt.Println("hello getty")
 }
 
