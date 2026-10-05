@@ -105,6 +105,7 @@ store.Set("name", "jsingh")
 const readers = 100
 const readEach = 10
 
+// add time.Sleep in Get() to see some difference
 start := time.Now()
 var wg sync.WaitGroup
 for range readers {
